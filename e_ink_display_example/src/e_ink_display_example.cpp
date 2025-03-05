@@ -1,35 +1,61 @@
-/* 
- * Project myProject
- * Author: Your Name
- * Date: 
- * For comprehensive documentation and examples, please visit:
- * https://docs.particle.io/firmware/best-practices/firmware-template/
- */
+/***************************************************
+  Example “Hello World” for Adafruit E-Ink Friend
+  using Adafruit_EPD_RK on a Photon 2
+****************************************************/
 
-// Include Particle Device OS APIs
 #include "Particle.h"
 
-// Let Device OS manage the connection to the Particle Cloud
-SYSTEM_MODE(AUTOMATIC);
+// Include Particle-ported Adafruit GFX & EPD libraries
+#include "Adafruit_GFX_RK.h"
+#include "Adafruit_EPD_RK.h"
 
-// Run the application and system concurrently in separate threads
-SYSTEM_THREAD(ENABLED);
+// --------------------------------------------------
+// Pin definitions (change if needed for your wiring)
+// --------------------------------------------------
+#define EPD_CS       D5    // E-Ink display chip select
+#define SRAM_CS      D6    // SRAM chip select
+#define EPD_BUSY     D7    // Busy pin from the E-Ink display
 
-// Show system, cloud connectivity, and application logs over USB
-// View logs with CLI using 'particle serial monitor --follow'
-SerialLogHandler logHandler(LOG_LEVEL_INFO);
+// If your E-Ink breakout exposes these, uncomment and assign pins:
+// #define EPD_DC    D4    // Data/Command
+// #define EPD_RST   D3    // Reset
 
-// setup() runs once, when the device is first turned on
+// --------------------------------------------------
+// Create display object (driver & resolution must match your panel)
+// Example: IL0373 driver at 152x152 resolution, no DC/RST pins used
+// --------------------------------------------------
+Adafruit_IL0373 display(
+  152,        // width
+  152,        // height
+  /* DC  */ -1,
+  /* RST */ -1,
+  EPD_CS,
+  SRAM_CS,
+  EPD_BUSY
+);
+
 void setup() {
-  // Put initialization like pinMode and begin functions here
+  // Start Particle
+  //Particle.begin();
+
+  // Initialize the EPD display
+  display.begin();
+
+  // Clear the internal buffer
+  display.clearBuffer();
+
+  // Set up text
+  display.setTextSize(1);           // Increase for bigger text
+  display.setTextColor(EPD_BLACK);  // Black text
+  display.setCursor(0, 0);
+
+  // Print "Hello World"
+  display.println("Hello World");
+
+  // Send the buffer to the E-Ink display
+  display.display();
 }
 
-// loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  // The core of your code will likely live here.
-
-  // Example: Publish event to cloud every 10 seconds. Uncomment the next 3 lines to try it!
-  // Log.info("Sending Hello World to the cloud!");
-  // Particle.publish("Hello world!");
-  // delay( 10 * 1000 ); // milliseconds and blocking - see docs for more info!
+  // E-Ink remains static until you update again
 }
